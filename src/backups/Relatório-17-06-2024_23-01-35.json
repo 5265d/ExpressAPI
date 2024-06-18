@@ -1,0 +1,27 @@
+{
+  "timestamp": "17/06/2024 - 23:01:35",
+  "ip": "::ffff:26.209.165.126",
+  "data": [
+    {
+      "id": "08",
+      "item": "Borracha Dura",
+      "quant": 22,
+      "datalote": "2024-06-01T03:00:00.000Z",
+      "datavenda": "2024-06-10T03:00:00.000Z"
+    },
+    {
+      "id": "09",
+      "item": "Borracha Queimada",
+      "quant": 153,
+      "datalote": "2024-06-01T03:00:00.000Z",
+      "datavenda": "2024-06-10T03:00:00.000Z"
+    },
+    {
+      "id": "10",
+      "item": "Ramon",
+      "quant": 120,
+      "datalote": "2024-06-01T03:00:00.000Z",
+      "datavenda": "2024-06-17T03:00:00.000Z"
+    }
+  ]
+}
