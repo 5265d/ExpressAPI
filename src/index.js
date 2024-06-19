@@ -84,9 +84,7 @@ function saveRequestCounts() {
   fs.writeFile(requestCountsFilePath, data, (err) => {
     if (err) {
       console.error("Erro ao salvar contagem de requisições:", err);
-    } else {
-      console.log("Contagem de requisições salva com sucesso!");
-    }
+    } 
   });
 }
 
