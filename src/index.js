@@ -23,19 +23,19 @@ app.use(cors());
 app.use(helmet());
 
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 500,
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10),
+  max: parseInt(process.env.RATE_LIMIT_MAX_GLOBAL, 10),
 });
 app.use(globalLimiter);
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10),
+  max: parseInt(process.env.RATE_LIMIT_MAX_API, 10),
 });
 
 app.use("/api", apiLimiter);
 
-const requestCountsFilePath = path.join(__dirname, "IPs", "IP-Requests.json");
+const requestCountsFilePath = path.join(__dirname, process.env.REQUEST_COUNTS_FILE);
 
 let requestCounts = {};
 if (fs.existsSync(requestCountsFilePath)) {
@@ -43,21 +43,20 @@ if (fs.existsSync(requestCountsFilePath)) {
   requestCounts = JSON.parse(data);
 }
 
-const authorizedIPs = [];
+const authorizedIPs = process.env.AUTIP.split(',');
 
 /**
  * Middleware para verificar se o IP está autorizado.
  * @param {string} req.ip 
  * @param {string[]} authorizedIPs 
  */
-
 function checkIPAuthorization(req, res, next) {
-const ip = req.ip;
+  const ip = req.ip;
   if (!authorizedIPs.includes(ip)) {
     return res.status(403).send("IP não autorizado a fazer esta ação.");
   }
-   next();
- }
+  next();
+}
 
 // app.use("/api", checkIPAuthorization);
 
@@ -79,7 +78,6 @@ app.use("/api", (req, res, next) => {
  * Função para salvar a contagem de requisições no arquivo JSON.
  * @param {object} requestCounts
  */
-
 function saveRequestCounts() {
   const data = JSON.stringify(requestCounts, null, 2);
 
@@ -97,7 +95,6 @@ function saveRequestCounts() {
  * @param {Date} date - Objeto Date que representa a data a ser formatada.
  * @returns {string} String formatada da data no formato especificado.
  */
-
 function formatDate(date) {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -114,7 +111,6 @@ function formatDate(date) {
  * @param {Date} date - Objeto Date que representa a data a ser formatada.
  * @returns {string} String formatada da data no formato especificado.
  */
-
 function formatFileNameDate(date) {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -130,7 +126,6 @@ function formatFileNameDate(date) {
  * @param {string} dateString - String contendo a data a ser validada.
  * @returns {boolean} true se a data for válida, false caso contrário.
  */
-
 function isValidDate(dateString) {
   const regex = /^\d{4}-\d{2}-\d{2}$/;
   return regex.test(dateString);
@@ -173,7 +168,7 @@ app.get("/api", async (req, res) => {
     const formattedDate = formatDate(now);
     const formattedFileNameDate = formatFileNameDate(now);
     const filename = `Relatório-${formattedFileNameDate}.json`;
-    const backupDir = path.join(__dirname, "backups");
+    const backupDir = path.join(__dirname, process.env.BACKUP_DIR);
 
     if (!fs.existsSync(backupDir)) {
       fs.mkdirSync(backupDir);
@@ -193,7 +188,7 @@ app.get("/api", async (req, res) => {
       }
     });
 
-    cache.put(cacheKey, result.rows, 5 * 60 * 1000);
+    cache.put(cacheKey, result.rows, parseInt(process.env.CACHE_DURATION_MS, 10));
 
     saveRequestCounts();
   } catch (err) {
@@ -206,4 +201,4 @@ app.get("/request-counts", (req, res) => {
   res.json(requestCounts);
 });
 
-app.listen(process.env.PORT, () => {});
+app.listen(process.env.PORT);
